@@ -1,38 +1,59 @@
 const express = require('express');
 const cors = require('cors');
-const userRouter = require('./users/userRoutes');
 const morgan = require('morgan');
-const PORT = 8080;
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const userRouter = require('./contact/contactRoutes');
 
-class UserServer {
-  constructor() {
-    this.server = null;
-  }
+dotenv.config();
 
-  start() {
-    this.initServer(),
-      this.initMiddlewares(),
-      this.initRoutes(),
-      this.startListening();
-  }
+const DB_NAME = process.env.DB_NAME;
+const DB_PASSWORD = process.env.DB_PASSWORD;
+const PORT = process.env.PORT || 8080;
+const MONGO_URL = `mongodb+srv://admin:${DB_PASSWORD}@cluster0.ihyfi.mongodb.net/${DB_NAME}?retryWrites=true&w=majority`;
+let server;
 
-  initServer() {
-    this.server = express();
-  }
-  initMiddlewares() {
-    this.server.use(express.json());
-    this.server.use(morgan('dev'));
-    this.server.use(cors({ origin: 'http://localhost:8080' }));
-  }
-  initRoutes() {
-    this.server.use('/api/contacts', userRouter);
-  }
-  startListening() {
-    this.server.listen(PORT, () => {
-      console.log('Server is listening on Port', PORT);
+start();
+
+function start() {
+  initServer();
+  initMiddlewares();
+  initRoutes();
+  connectDatabase();
+  listen();
+}
+
+function initServer() {
+  server = express();
+}
+
+function initMiddlewares() {
+  server.use(express.json());
+  server.use(cors({ origin: 'http://localhost:8080' }));
+  server.use(morgan('dev'));
+}
+
+function initRoutes() {
+  server.use('/api/contacts', userRouter);
+}
+
+async function connectDatabase() {
+  try {
+    await mongoose.connect(MONGO_URL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useCreateIndex: true,
+      useFindAndModify: false,
     });
+    console.log('Database connection successful');
+  } catch (error) {
+    console.log(error);
+    process.exit(1);
   }
 }
 
-const server = new UserServer();
-server.start();
+function listen() {
+  server.listen(PORT, () => {
+    console.log('Server is listening on port: ', PORT);
+  });
+}
