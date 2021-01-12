@@ -1,17 +1,17 @@
 const Joi = require('joi');
 const ContactsFunctions = require('./contacts');
 
-class ApiRequests {
-  getContactList(req, res, next) {
+class ContactRequests {
+  getContactList(req, res) {
     return res.status(200).json(ContactsFunctions.listContacts());
   }
 
-  getContactById(req, res, next) {
+  getContactById(req, res) {
     const id = req.params.contactId;
     return res.status(200).json(ContactsFunctions.getContactById(id));
   }
 
-  createContact(req, res, next) {
+  createContact(req, res) {
     return res
       .status(201)
       .json(
@@ -23,13 +23,13 @@ class ApiRequests {
       );
   }
 
-  deleteContact(req, res, next) {
+  deleteContact(req, res) {
     const id = req.params.contactId;
     ContactsFunctions.removeContact(id);
     return res.status(200).json('contact deleted');
   }
 
-  updateContacts(req, res, next) {
+  updateContacts(req, res) {
     const id = req.params.contactId;
     const data = req.body;
 
@@ -59,11 +59,9 @@ class ApiRequests {
       name: Joi.string(),
       email: Joi.string(),
       phone: Joi.string(),
-    });
+    }).min(1);
     const result = contactsRules.validate(req.body);
-    if (Object.keys(req.body).length === 0) {
-      return res.status(400).send('missing fields');
-    }
+
     if (result.error) {
       return res.status(400).send(result.error.message);
     }
@@ -83,4 +81,4 @@ class ApiRequests {
   };
 }
 
-module.exports = new ApiRequests();
+module.exports = new ContactRequests();

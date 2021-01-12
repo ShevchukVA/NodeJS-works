@@ -1,10 +1,10 @@
 const express = require('express');
 const cors = require('cors');
-const userRouter = require('./users/userRoutes');
+const contactRouter = require('./contact/contactRoutes');
 const morgan = require('morgan');
 const PORT = 8080;
 
-class UserServer {
+class ContactServer {
   constructor() {
     this.server = null;
   }
@@ -25,7 +25,7 @@ class UserServer {
     this.server.use(cors({ origin: 'http://localhost:8080' }));
   }
   initRoutes() {
-    this.server.use('/api/contacts', userRouter);
+    this.server.use('/api/contacts', contactRouter);
   }
   startListening() {
     this.server.listen(PORT, () => {
@@ -34,5 +34,5 @@ class UserServer {
   }
 }
 
-const server = new UserServer();
+const server = new ContactServer();
 server.start();
