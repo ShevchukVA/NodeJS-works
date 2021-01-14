@@ -1,5 +1,6 @@
 const { Router } = require('express');
 const contactRouter = Router();
+
 const ApiRequests = require('./contactControllers');
 
 contactRouter.get('/', ApiRequests.getContactList);

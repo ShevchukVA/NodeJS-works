@@ -3,7 +3,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const userRouter = require('./contact/contactRoutes');
+const contactRouter = require('./contact/contactRoutes');
 
 dotenv.config();
 
@@ -57,3 +57,4 @@ function listen() {
     console.log('Server is listening on port: ', PORT);
   });
 }
+
