@@ -1,3 +1,6 @@
+const {
+  Types: { ObjectId },
+} = require('mongoose');
 const Joi = require('joi');
 const bcryptjs = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -9,16 +12,19 @@ async function createUser(req, res) {
     const {
       body: { email, password },
     } = req;
+
     const findEmail = await User.findOne({ email });
 
     if (findEmail) {
       return res.status(409).send('Email in use');
     }
+
     const hashedPassword = await bcryptjs.hash(password, 10);
     const data = await User.create({
       ...req.body,
       password: hashedPassword,
     });
+
     res
       .status(201)
       .json({ user: { email: data.email, subscription: data.subscription } });
@@ -163,6 +169,26 @@ function validateUpdateUser(req, res, next) {
   next();
 }
 
+async function validateUserId(req, res, next) {
+  const {
+    body: { email },
+  } = req;
+
+  const user = await User.findOne({
+    email,
+  });
+
+  if (user === null) {
+    return res.status(404).send('User is not found');
+  }
+
+  if (!ObjectId.isValid(user._id)) {
+    return res.status(400).send('Id is not valid');
+  }
+
+  next();
+}
+
 module.exports = {
   createUser,
   loginUser,
@@ -172,4 +198,5 @@ module.exports = {
   updateUser,
   validateUser,
   validateUpdateUser,
+  validateUserId,
 };
