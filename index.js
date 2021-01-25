@@ -3,7 +3,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
-const contactRouter = require('./contact/contactRoutes');
+const contactRouter = require('./contacts/contact.routers');
+const userRouter = require('./users/user.routers');
 
 dotenv.config();
 
@@ -34,7 +35,8 @@ function initMiddlewares() {
 }
 
 function initRoutes() {
-  server.use('/api/contacts', userRouter);
+  server.use('/api/contacts', contactRouter);
+  server.use('/', userRouter);
 }
 
 async function connectDatabase() {
@@ -57,4 +59,3 @@ function listen() {
     console.log('Server is listening on port: ', PORT);
   });
 }
-
